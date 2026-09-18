@@ -1,0 +1,12 @@
+# Shell scripts must reach the server with LF endings. A CRLF shebang makes
+# bash fail with "bad interpreter: /usr/bin/env bash^M", which is a confusing
+# way to lose an afternoon.
+*.sh        text eol=lf
+*.env       text eol=lf
+deploy/*    text eol=lf
+
+# Everything else: normalise in the repo, let the checkout decide.
+*           text=auto
+*.jpg       binary
+*.png       binary
+*.svg       text eol=lf
