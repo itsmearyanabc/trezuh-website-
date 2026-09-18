@@ -15,7 +15,16 @@
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/_common.sh"
 
 ASSUME_YES=0
-case "${1:-}" in --yes|-y) ASSUME_YES=1 ;; esac
+FORCE_NGINX=0
+for arg in "$@"; do
+  case "$arg" in
+    --yes|-y) ASSUME_YES=1 ;;
+    # Rewrite the nginx site from the template even if certbot has been here.
+    # Needed when the existing config is for the wrong names — e.g. a preview
+    # hostname was certified and the real domain now has to take over.
+    --force-nginx) FORCE_NGINX=1 ;;
+  esac
+done
 
 MARKER="# managed by ${APP_NAME} deploy — do not hand-edit"
 
@@ -122,10 +131,16 @@ if [ -e "$NGINX_SITE" ] && $SUDO grep -qE 'managed by Certbot|listen .*443' "$NG
   CURRENT_NAMES="$($SUDO grep -hE '^[[:space:]]*server_name' "$NGINX_SITE" | tr -d ';' | sed 's/.*server_name//')"
   $SUDO cp -a "$NGINX_SITE" "${NGINX_SITE}.bak-$(date +%Y%m%d%H%M%S)"
 
-  if printf '%s' "$CURRENT_NAMES" | grep -qE "(^| )${DOMAIN}( |$)"; then
+  if [ "$FORCE_NGINX" = "1" ]; then
+    say "Rewriting ${NGINX_SITE} (--force-nginx)"
+    note "the old config had TLS for:${CURRENT_NAMES}"
+    note "re-run deploy/ssl.sh straight afterwards, or https falls through to"
+    note "whichever site owns the default 443 block"
+    note "backup: ${NGINX_SITE}.bak-*"
+  elif printf '%s' "$CURRENT_NAMES" | grep -qE "(^| )${DOMAIN}( |$)"; then
     say "Leaving ${NGINX_SITE} alone"
     note "it already has TLS for ${DOMAIN} — rewriting it would drop the certificate"
-    note "a backup was taken anyway; edit it by hand if you need to change something"
+    note "a backup was taken anyway; pass --force-nginx to rewrite it regardless"
     SKIP_NGINX=1
   else
     say "Rewriting ${NGINX_SITE} for the new domain"

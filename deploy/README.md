@@ -143,6 +143,10 @@ file at all unless the domain has actually changed — otherwise a redeploy
 would quietly drop TLS and put you back in exactly this situation. When the
 domain does change it rewrites and tells you to run `ssl.sh` again.
 
+`--force-nginx` rewrites regardless. That is what you want when the config is
+built around the wrong names — a preview hostname was certified and the real
+domain now has to take over. Run `ssl.sh` immediately afterwards.
+
 ## Redeploying
 
 ```bash

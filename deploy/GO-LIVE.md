@@ -44,6 +44,18 @@ cp /var/www/trezuh/deploy/deploy.env.example /var/www/trezuh/deploy/deploy.env &
 cd /var/www/trezuh && bash deploy/setup.sh
 ```
 
+If a preview hostname was certified earlier — `<ip>.nip.io`, say — certbot
+will have rewritten the nginx site around that name, and the real domain then
+gets a 404 on port 80 and the wrong certificate on 443. Rewrite it:
+
+```bash
+cd /var/www/trezuh && bash deploy/setup.sh --force-nginx
+```
+
+and run step 6 straight afterwards, because between the two the domain has no
+443 block of its own and https falls through to whichever site owns the
+default one.
+
 Use `setup.sh`, not `update.sh`: the domain has changed, so `server_name` has
 to change with it, and `update.sh` never touches nginx. It prints what it will
 create and waits for a `y`. It reloads nginx rather than restarting it, and
