@@ -160,7 +160,11 @@ if [ "$WITH_WWW" = "1" ]; then
     listen 80;
     listen [::]:80;
     server_name www.${DOMAIN};
-    return 301 http://${DOMAIN}\$request_uri;
+    # $scheme, not a hard-coded http: before certbot runs this block only
+    # exists on port 80, and after it runs certbot copies it to 443 too. A
+    # literal http:// would send every https www visitor through an extra
+    # unencrypted hop.
+    return 301 \$scheme://${DOMAIN}\$request_uri;
 }
 "
 fi
