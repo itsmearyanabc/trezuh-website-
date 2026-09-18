@@ -129,53 +129,29 @@ worth more than anything on the page.
 
 ## Deploying to a Hostinger VPS
 
-The build emits `.next/standalone`, a self-contained Node server.
+Scripts and full notes are in [`deploy/`](deploy/README.md). They assume the
+box is already serving other things and are written so that it keeps doing so:
+every name is namespaced (`/var/www/trezuh`, pm2 app `trezuh`, port 3100,
+`trezuh.conf`), the setup script aborts before changing anything if any of
+those is already taken by something else, no shared config is ever edited, and
+nginx is reloaded rather than restarted — only after `nginx -t` passes.
 
 ```bash
-# on the VPS, as a non-root user
-git clone https://github.com/itsmearyanabc/trezuh-website-.git trezuh
-cd trezuh
-npm ci
-echo "NEXT_PUBLIC_SITE_URL=https://yourdomain.com" > .env.production
-npm run build
-
-# the standalone output needs the static assets copied in beside it
-cp -r .next/static .next/standalone/.next/static
-cp -r public .next/standalone/public
-
-# run it under pm2 so it survives reboots
-pm2 start .next/standalone/server.js --name trezuh --update-env
-pm2 save && pm2 startup
+git clone https://github.com/itsmearyanabc/trezuh-website-.git /tmp/trezuh-deploy
+cd /tmp/trezuh-deploy
+cp deploy/deploy.env.example deploy/deploy.env
+nano deploy/deploy.env          # set DOMAIN
+bash deploy/setup.sh            # checkout, build, pm2, nginx
+bash deploy/ssl.sh              # once DNS resolves to this box
 ```
 
-The server listens on `PORT` (default 3000). Put nginx in front of it:
+Afterwards, `cd /var/www/trezuh && bash deploy/update.sh` to redeploy, and
+`bash deploy/status.sh` to see this app next to everything else on the server.
 
-```nginx
-server {
-  server_name yourdomain.com www.yourdomain.com;
-
-  location / {
-    proxy_pass http://127.0.0.1:3000;
-    proxy_http_version 1.1;
-    proxy_set_header Host $host;
-    proxy_set_header X-Real-IP $remote_addr;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-  }
-
-  # hashed build assets never change
-  location /_next/static/ {
-    proxy_pass http://127.0.0.1:3000;
-    add_header Cache-Control "public, max-age=31536000, immutable";
-  }
-}
-```
-
-Then `sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com` for TLS.
-In Hostinger's DNS, point the `A` record for `@` and `www` at the VPS IP.
-
-To redeploy: `git pull && npm ci && npm run build`, copy `static` and
-`public` into `.next/standalone` again, then `pm2 restart trezuh`.
+The one thing to check first: Next 16 needs **Node ≥ 20.9**. If other apps on
+the VPS are pinned to an older Node, install a second Node with nvm for the
+deploy user rather than upgrading the system package — see
+[`deploy/README.md`](deploy/README.md).
 
 ## Before launch
 
