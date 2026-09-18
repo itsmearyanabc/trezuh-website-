@@ -114,6 +114,31 @@ untouched, and renewal is the existing system timer.
 Behind Cloudflare's orange cloud the DNS check will disagree — use
 `bash deploy/ssl.sh --force`, or set Cloudflare to DNS-only while issuing.
 
+## A hostname with no certificate falls through to another site
+
+nginx picks a server block by name *per listening port*. A block that only
+`listen 80` does not exist as far as port 443 is concerned, so an `https://`
+request for that name matches nothing and nginx answers with whichever block
+is default on 443 — one of the other sites on this box, under its own
+certificate.
+
+Browsers upgrade typed and clicked links to `https://`, so a preview hostname
+without a certificate will show someone else's site. Either issue a
+certificate for it:
+
+```bash
+sudo certbot --nginx -d <hostname> --redirect
+```
+
+or go straight to the real domain and run `deploy/ssl.sh`. `http://` alone is
+not something you can rely on a browser respecting.
+
+`setup.sh` knows about this: if it finds certbot's config already in
+`trezuh.conf` it takes a `.bak-<timestamp>` copy, and it will not rewrite the
+file at all unless the domain has actually changed — otherwise a redeploy
+would quietly drop TLS and put you back in exactly this situation. When the
+domain does change it rewrites and tells you to run `ssl.sh` again.
+
 ## Redeploying
 
 ```bash

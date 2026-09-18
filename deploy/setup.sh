@@ -114,7 +114,31 @@ pm2 startOrReload "$APP_DIR/deploy/ecosystem.config.cjs" --only "$APP_NAME" --up
 pm2 save    # additive: snapshots every app you are running, not just this one
 
 # ------------------------------------------------------------------- nginx
+# Certbot writes its listen-443 block and cert paths straight into this file.
+# Rewriting it from the template would silently throw that away and leave the
+# site answering on 80 only — which is how a preview link ends up showing
+# whichever other site owns the default 443 block.
+if [ -e "$NGINX_SITE" ] && $SUDO grep -qE 'managed by Certbot|listen .*443' "$NGINX_SITE" 2>/dev/null; then
+  CURRENT_NAMES="$($SUDO grep -hE '^[[:space:]]*server_name' "$NGINX_SITE" | tr -d ';' | sed 's/.*server_name//')"
+  $SUDO cp -a "$NGINX_SITE" "${NGINX_SITE}.bak-$(date +%Y%m%d%H%M%S)"
+
+  if printf '%s' "$CURRENT_NAMES" | grep -qE "(^| )${DOMAIN}( |$)"; then
+    say "Leaving ${NGINX_SITE} alone"
+    note "it already has TLS for ${DOMAIN} — rewriting it would drop the certificate"
+    note "a backup was taken anyway; edit it by hand if you need to change something"
+    SKIP_NGINX=1
+  else
+    say "Rewriting ${NGINX_SITE} for the new domain"
+    note "the old config had TLS for:${CURRENT_NAMES}"
+    note "that certificate config is being replaced — re-run deploy/ssl.sh afterwards"
+    note "backup: ${NGINX_SITE}.bak-*"
+  fi
+fi
+
+SKIP_NGINX="${SKIP_NGINX:-0}"
+if [ "$SKIP_NGINX" != "1" ]; then
 say "Writing ${NGINX_SITE}"
+
 REDIRECT_BLOCK=""
 if [ "$WITH_WWW" = "1" ]; then
   REDIRECT_BLOCK="server {
@@ -171,6 +195,7 @@ server {
 NGINX
 
 $SUDO ln -sfn "$NGINX_SITE" "$NGINX_LINK"
+fi
 
 say "Testing the whole nginx config before touching the running server"
 $SUDO nginx -t || die "nginx -t failed. Nothing was reloaded; your other sites are untouched. Fix the error above and re-run."
