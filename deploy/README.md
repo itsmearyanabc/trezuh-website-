@@ -1,6 +1,10 @@
 # Deploying to the VPS
 
-Four scripts. They assume this box is already serving other things and are
+**Going live for the first time? Follow [GO-LIVE.md](GO-LIVE.md)** — the whole
+sequence in order, from pulling the code to getting into Google, with the
+GoDaddy records spelled out.
+
+Five scripts. They assume this box is already serving other things and are
 written so that it keeps doing so.
 
 ```

@@ -18,6 +18,7 @@ APP_PORT="${APP_PORT:-3100}"
 APP_DIR="${APP_DIR:-/var/www/trezuh}"
 REPO="${REPO:-https://github.com/itsmearyanabc/trezuh-website-.git}"
 BRANCH="${BRANCH:-main}"
+GOOGLE_SITE_VERIFICATION="${GOOGLE_SITE_VERIFICATION:-}"
 
 NGINX_SITE="/etc/nginx/sites-available/${APP_NAME}.conf"
 NGINX_LINK="/etc/nginx/sites-enabled/${APP_NAME}.conf"
@@ -47,8 +48,17 @@ require_node() {
   command -v pm2 >/dev/null 2>&1 || die "pm2 is not installed. Install it with: npm i -g pm2"
 }
 
-# The site URL is baked in at build time, so every build has to see it.
+# The site URL is compiled in, so it has to be on disk before `next build`.
 site_url() { printf 'https://%s' "$DOMAIN"; }
+
+write_env() {
+  {
+    echo "NEXT_PUBLIC_SITE_URL=$(site_url)"
+    if [ -n "$GOOGLE_SITE_VERIFICATION" ]; then
+      echo "NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION=${GOOGLE_SITE_VERIFICATION}"
+    fi
+  } > "$APP_DIR/.env.production"
+}
 
 # Build, then assemble the standalone output into something runnable.
 # Next emits .next/standalone without the static assets; they have to be
@@ -59,7 +69,8 @@ build_app() {
   ( cd "$APP_DIR" && npm ci --no-audit --no-fund )
 
   say "Building for $(site_url)"
-  ( cd "$APP_DIR" && printf 'NEXT_PUBLIC_SITE_URL=%s\n' "$(site_url)" > .env.production )
+  write_env
+  [ -n "$GOOGLE_SITE_VERIFICATION" ] && note "including the Search Console verification tag"
   ( cd "$APP_DIR" && npm run build )
 
   say "Assembling the standalone server"

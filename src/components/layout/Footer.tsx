@@ -78,7 +78,7 @@ export function Footer() {
               ))}
               <li>
                 <a
-                  href={`https://wa.me/${BRAND.phone.whatsapp}`}
+                  href={BRAND.phone.whatsapp}
                   target="_blank"
                   rel="noreferrer noopener"
                   className="label opacity-75 transition-opacity duration-500 hover:opacity-100"

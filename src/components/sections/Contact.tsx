@@ -40,8 +40,16 @@ export function Contact() {
             </Reveal>
 
             <Reveal delay={0.1}>
-              <Link
-                href={`mailto:${BRAND.email}`}
+              {/* WhatsApp rather than mailto. A mailto: link does nothing at
+                  all on a desktop with no mail client configured — no error,
+                  no feedback — which is not acceptable for the one button on
+                  the page. This opens the app on a phone and web.whatsapp.com
+                  on a desktop, every time. Email stays underneath for anyone
+                  who prefers it. */}
+              <a
+                href={BRAND.phone.whatsapp}
+                target="_blank"
+                rel="noreferrer noopener"
                 className="group relative mt-[clamp(2.5rem,4vw,3.5rem)] flex w-full max-w-[28rem] items-center justify-between overflow-hidden border rule px-7 py-6"
               >
                 <span
@@ -49,7 +57,7 @@ export function Contact() {
                   className="absolute inset-0 origin-left scale-x-0 bg-paper transition-transform duration-[800ms] ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-x-100 group-focus-visible:scale-x-100"
                 />
                 <span className="label relative transition-colors duration-[600ms] group-hover:text-ink group-focus-visible:text-ink">
-                  Contact TREZUH
+                  Message on WhatsApp
                 </span>
                 <span
                   aria-hidden
@@ -57,7 +65,19 @@ export function Contact() {
                 >
                   &#8594;
                 </span>
-              </Link>
+              </a>
+            </Reveal>
+
+            <Reveal delay={0.16}>
+              <p className="label mt-7 opacity-60">
+                or write to{" "}
+                <a
+                  href={`mailto:${BRAND.email}`}
+                  className="underline decoration-[0.5px] underline-offset-[6px] opacity-100 transition-opacity duration-500 hover:opacity-70"
+                >
+                  {BRAND.email}
+                </a>
+              </p>
             </Reveal>
           </div>
 

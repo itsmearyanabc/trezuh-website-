@@ -52,7 +52,7 @@ export function WhatsAppButton() {
     <AnimatePresence>
       {visible ? (
         <motion.a
-          href={`https://wa.me/${BRAND.phone.whatsapp}`}
+          href={BRAND.phone.whatsapp}
           target="_blank"
           rel="noreferrer noopener"
           aria-label={`Message ${BRAND.name} on WhatsApp`}

@@ -86,6 +86,11 @@ export const metadata: Metadata = {
     },
   },
   formatDetection: { telephone: true, address: true, email: true },
+  /* Google Search Console's HTML-tag verification. Set
+     NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION and rebuild — no code change. */
+  verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export const viewport: Viewport = {

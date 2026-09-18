@@ -21,8 +21,8 @@ export const BRAND = {
     display: "+91 81217 64901",
     /** As it is dialled. */
     tel: "+918121764901",
-    /** As wa.me expects it: country code, no plus, no spaces. */
-    whatsapp: "918121764901",
+    /** The WhatsApp Business short link every WhatsApp entry point uses. */
+    whatsapp: "https://wa.me/message/LGSUZQGAF35TK1",
   },
   address: {
     street: "Road No. 12, Banjara Hills",
