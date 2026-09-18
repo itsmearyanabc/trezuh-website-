@@ -150,19 +150,12 @@ server {
         proxy_read_timeout 60s;
     }
 
-    # Build assets are content-hashed: they can be cached forever.
-    location /_next/static/ {
-        proxy_pass http://127.0.0.1:${APP_PORT};
-        proxy_set_header Host \$host;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
-
-    # Optimised images: a day in the browser, long in the CDN.
-    location /_next/image {
-        proxy_pass http://127.0.0.1:${APP_PORT};
-        proxy_set_header Host \$host;
-        add_header Cache-Control "public, max-age=86400, stale-while-revalidate=604800";
-    }
+    # No caching rules here on purpose. Next already sends the right ones —
+    # "public, max-age=315360000, immutable" for both the hashed build assets
+    # and the optimised images, because every one of those URLs is content
+    # addressed. An add_header here does not replace that, it appends a second
+    # Cache-Control, and a browser handed two conflicting ones takes the
+    # stricter. Adding a "helpful" one-day rule made caching worse.
 
     gzip on;
     gzip_vary on;

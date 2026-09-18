@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
      the form we deploy to the Hostinger VPS behind nginx. */
   output: "standalone",
   devIndicators: false,
+  /* Nothing gained by announcing the framework on every response. */
+  poweredByHeader: false,
   images: {
     formats: ["image/avif", "image/webp"],
   },
