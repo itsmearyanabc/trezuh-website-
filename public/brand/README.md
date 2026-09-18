@@ -1,13 +1,16 @@
 # Brand assets
 
-Drop the supplied TREZUH artwork here — `trezuh-wordmark.svg` for the wordmark
-and `trezuh-lockup.svg` for the wordmark-over-descriptor version.
+`trezuh-wordmark.svg` is the TREZUH wordmark, traced from the artwork supplied
+by the client. Cap height is 100 units, the full mark is 701.79 wide, and it
+inherits `currentColor` — so it can be dropped into anything and will take the
+colour of its context.
 
-The site currently sets the wordmark as live type in the display face (Jost),
-which matches the supplied logo's geometry, stays sharp at every size and
-remains selectable. To use the original artwork instead, edit
-`src/components/layout/Wordmark.tsx` — the swap is a single element and the
-instructions are in the file.
+The site does not load this file; `src/components/layout/Wordmark.tsx` carries
+the same outlines inline, so the mark paints with the first byte of HTML and
+never flashes. Keep the two in step if either changes.
 
-Rules that apply either way: monochrome only, no icon beside it, no effects,
-no change to its proportions or letterspacing.
+`src/app/icon.svg`, `src/app/apple-icon.png` and `src/app/opengraph-image.jpg`
+are all generated from these outlines as well.
+
+Rules: monochrome only, no icon beside it, no effects, and no change to its
+proportions or letterspacing.

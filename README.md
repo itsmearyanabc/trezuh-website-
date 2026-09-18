@@ -89,15 +89,26 @@ be touched to re-write the site.
 
 ## Brand
 
-The wordmark is **drawn, not typeset** — see
-`src/components/layout/Wordmark.tsx`. Every geometric grotesk shortens the
-middle arm of the E, which the TREZUH E does not, so the six letters are
-constructed as SVG on the logo's own grid: 100 units of cap height, an
-11-unit stroke, 22 units of tracking. That also means the wordmark needs no
-webfont, is identical in every browser, and never reflows while one loads.
+The wordmark is **traced from the supplied artwork**, not set in a typeface —
+see `src/components/layout/Wordmark.tsx`. The mark is deconstructed in ways no
+font reproduces:
 
-To use the original vector artwork instead, drop it at
-`public/brand/trezuh-wordmark.svg` and follow the note in the component.
+- the **E** is three detached bars with no vertical spine,
+- the **R** has no left stem — its bowl is closed by a diagonal that runs on
+  into the leg,
+- the letters are far wider than any grotesk (the whole mark is 7.0× its cap
+  height), with vertical strokes about 1.6× the weight of the horizontals.
+
+Substituting a font gets every one of those wrong, which is why the outlines
+were traced at 3× supersampling and simplified to 185 points — 2.4 KB of path
+data, no webfont dependency, identical in every browser, and it never reflows
+while something loads. The same outlines are in
+[`public/brand/trezuh-wordmark.svg`](public/brand/trezuh-wordmark.svg), and
+`icon.svg`, `apple-icon.png` and the Open Graph card are all generated from
+them.
+
+The descriptor in the lockup follows the artwork too: sentence case, light,
+bullet separated — not the small-caps label used elsewhere on the page.
 
 ## SEO
 

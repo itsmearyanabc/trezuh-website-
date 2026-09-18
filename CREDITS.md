@@ -23,11 +23,17 @@ Replace them by dropping new files into `src/assets/images/` under the same
 names — the static imports in `src/lib/images.ts` pick up the new dimensions
 and regenerate the blur placeholders automatically.
 
+# The wordmark
+
+Traced from the artwork supplied by the client, at 3x supersampling, and
+simplified to 185 points. It is not set in any typeface — see
+`src/components/layout/Wordmark.tsx` for why no font can stand in for it.
+
 # Typefaces
 
-- **Jost** (Google Fonts) — display. A geometric grotesk chosen because it
-  shares the wordmark's construction: the single-storey diagonal `R`, the flat
-  `E` arms, the circular `O`.
+- **Jost** (Google Fonts) — display, for headlines only. A geometric grotesk
+  chosen because it sits comfortably beside the wordmark; it is never used to
+  set the wordmark itself.
 - **Manrope** (Google Fonts) — text.
 - **Cormorant Garamond** (Google Fonts) — the italic serif accent, used four
   times on the entire page.
